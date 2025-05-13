@@ -1,0 +1,40 @@
+{
+  "name": "js-manifest-extractor",
+  "version": "1.0.0",
+  "description": "Extracts a manifest from JavaScript/TypeScript projects",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "replay": "node src/index.js --replay-errors",
+    "lint": "eslint . --fix"
+  },
+  "keywords": [
+    "javascript",
+    "typescript",
+    "manifest",
+    "extractor",
+    "codebase",
+    "analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/parser": "^7.22.7",
+    "@babel/traverse": "^7.22.8",
+    "@babel/types": "^7.22.5",
+    "dotenv": "^16.3.1",
+    "fast-glob": "^3.3.1",
+    "pino": "^8.15.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.45.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 
