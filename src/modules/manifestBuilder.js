@@ -72,6 +72,108 @@ export const buildManifest = trace(function buildManifest(parsedFiles, rootPath)
 });
 
 /**
+ * Optimizes the manifest for LLM consumption by removing unnecessary information
+ * @param {object} manifest - The complete manifest
+ * @returns {object} - LLM-optimized manifest
+ */
+export const optimizeForLLM = trace(function optimizeForLLM(manifest) {
+  // Create a new manifest with only the essential information
+  const optimizedManifest = {
+    version: manifest.version,
+    files: manifest.files.map(file => {
+      // Simplify file representation
+      return {
+        path: file.path,
+        symbols: file.symbols.map(simplifySymbol),
+        dependencies: file.dependencies,
+        hasDefaultExport: file.hasDefaultExport,
+      };
+    }),
+  };
+  
+  return optimizedManifest;
+});
+
+/**
+ * Simplifies a symbol by removing unnecessary information
+ * @param {object} symbol - Symbol object
+ * @returns {object} - Simplified symbol
+ */
+function simplifySymbol(symbol) {
+  // Base simplified symbol
+  const simplified = {
+    name: symbol.name,
+    type: symbol.type,
+  };
+  
+  // Handle different symbol types
+  if (symbol.type === 'fn') {
+    simplified.params = symbol.params ? symbol.params.map(simplifyParam) : [];
+    simplified.returnType = symbol.returnType;
+  } else if (symbol.type === 'class') {
+    simplified.fields = symbol.fields ? symbol.fields.map(field => ({
+      name: field.name,
+      type: field.type,
+      static: field.static,
+    })) : [];
+    
+    simplified.methods = symbol.methods ? symbol.methods.map(method => ({
+      name: method.name,
+      kind: method.kind,
+      static: method.static,
+      params: method.params ? method.params.map(simplifyParam) : [],
+      returnType: method.returnType,
+    })) : [];
+    
+    if (symbol.extends) {
+      simplified.extends = symbol.extends;
+    }
+  } else if (symbol.type === 'export') {
+    simplified.localName = symbol.localName;
+  }
+  
+  return simplified;
+}
+
+/**
+ * Simplifies a parameter by removing unnecessary information
+ * @param {object} param - Parameter object
+ * @returns {object} - Simplified parameter
+ */
+function simplifyParam(param) {
+  if (!param) return null;
+  
+  // Basic param with name and type
+  const simplified = {
+    name: param.name,
+    type: param.type,
+  };
+  
+  // Add hasDefault flag if present
+  if (param.hasDefault) {
+    simplified.hasDefault = true;
+  }
+  
+  // Simplify object patterns
+  if (param.name === 'objectPattern' && param.properties) {
+    simplified.properties = param.properties.map(prop => ({
+      name: prop.name,
+      type: prop.type,
+    }));
+  }
+  
+  // Simplify array patterns
+  if (param.name === 'arrayPattern' && param.elements) {
+    simplified.elements = param.elements.map(elem => ({
+      name: elem.name,
+      type: elem.type,
+    }));
+  }
+  
+  return simplified;
+}
+
+/**
  * Optimizes the manifest by deduplicating strings (optional)
  * @param {object} manifest - The complete manifest
  * @returns {object} - Optimized manifest with string table
@@ -132,4 +234,5 @@ export const optimizeManifest = trace(function optimizeManifest(manifest) {
 export default {
   buildManifest,
   optimizeManifest,
+  optimizeForLLM,
 }; 

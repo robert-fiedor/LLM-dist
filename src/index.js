@@ -4,7 +4,7 @@ import logger, { trace, readLastError } from './logger.js';
 import { parseCliArguments, printUsage } from './modules/cli.js';
 import { findSourceFiles, readFile, writeManifest } from './modules/fileSystem.js';
 import { parseFile } from './modules/parser.js';
-import { buildManifest, optimizeManifest } from './modules/manifestBuilder.js';
+import { buildManifest, optimizeManifest, optimizeForLLM } from './modules/manifestBuilder.js';
 import { UserInputError, FileSystemError, ParseError } from './errors.js';
 
 // Load environment variables
@@ -51,8 +51,18 @@ async function main() {
     // Build the manifest
     const manifest = buildManifest(processedFiles, config.sourcePath);
     
-    // Optimize the manifest if needed
-    const finalManifest = config.compress ? optimizeManifest(manifest) : manifest;
+    // Apply optimizations
+    let finalManifest = manifest;
+    
+    // First apply LLM optimization if requested (default behavior)
+    if (config.llmOptimized) {
+      finalManifest = optimizeForLLM(finalManifest);
+    }
+    
+    // Then apply string optimization if compression is requested
+    if (config.compress) {
+      finalManifest = optimizeManifest(finalManifest);
+    }
     
     // Write the manifest
     const outputPath = await writeManifest(finalManifest, config.outputPath, config.compress);
@@ -60,7 +70,7 @@ async function main() {
     
     console.log(`✅ Manifest extraction complete. Output: ${outputPath}`);
     
-    // Stats
+    // Stats - always available for console output even when not included in the output file
     const stats = manifest.stats;
     console.log(`
 Extraction summary:
@@ -71,6 +81,8 @@ Extraction summary:
 - Constants: ${stats.typeStats.constants}
 - Exports: ${stats.typeStats.exports}
 - Dependencies: ${stats.totalDependencies}
+${config.llmOptimized ? '- LLM optimization: ENABLED (use --full-format to disable)' : '- Full format: ENABLED'}
+${config.compress ? '- Compression: ENABLED' : ''}
 `);
     
   } catch (err) {

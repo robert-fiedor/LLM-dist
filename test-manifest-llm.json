@@ -1,0 +1,165 @@
+{
+  "version": "1.0.0",
+  "files": [
+    {
+      "path": "sample.js",
+      "symbols": [
+        {
+          "name": "processFile",
+          "type": "fn",
+          "params": [
+            {
+              "name": "filePath",
+              "type": "any"
+            }
+          ],
+          "returnType": "any"
+        },
+        {
+          "name": "content",
+          "type": "const"
+        },
+        {
+          "name": "Person",
+          "type": "class",
+          "fields": [],
+          "methods": [
+            {
+              "name": "constructor",
+              "kind": "constructor",
+              "static": false,
+              "params": [
+                {
+                  "name": "name",
+                  "type": "any"
+                },
+                {
+                  "name": "age",
+                  "type": "any"
+                }
+              ],
+              "returnType": "any"
+            },
+            {
+              "name": "greet",
+              "kind": "method",
+              "static": false,
+              "params": [
+                {
+                  "name": "other",
+                  "type": "any"
+                }
+              ],
+              "returnType": "any"
+            },
+            {
+              "name": "getDetails",
+              "kind": "method",
+              "static": false,
+              "params": [],
+              "returnType": "any"
+            }
+          ]
+        },
+        {
+          "name": "formatString",
+          "type": "fn",
+          "params": [
+            {
+              "name": "str",
+              "type": "any"
+            }
+          ],
+          "returnType": "any"
+        }
+      ],
+      "dependencies": [
+        {
+          "type": "import",
+          "source": "fs/promises",
+          "specifiers": [
+            {
+              "type": "named",
+              "local": "readFile",
+              "imported": "readFile"
+            }
+          ]
+        },
+        {
+          "type": "import",
+          "source": "path",
+          "specifiers": [
+            {
+              "type": "default",
+              "local": "path"
+            }
+          ]
+        }
+      ],
+      "hasDefaultExport": true
+    },
+    {
+      "path": "utils/helper.js",
+      "symbols": [
+        {
+          "name": "generateId",
+          "type": "fn",
+          "params": [
+            {
+              "name": "length",
+              "type": "any",
+              "hasDefault": true
+            }
+          ],
+          "returnType": "any"
+        },
+        {
+          "name": "chars",
+          "type": "const"
+        },
+        {
+          "name": "result",
+          "type": "const"
+        },
+        {
+          "name": "i",
+          "type": "const"
+        },
+        {
+          "name": "formatDate",
+          "type": "fn",
+          "params": [
+            {
+              "name": "date",
+              "type": "any"
+            },
+            {
+              "name": "format",
+              "type": "any",
+              "hasDefault": true
+            }
+          ],
+          "returnType": "any"
+        },
+        {
+          "name": "year",
+          "type": "const"
+        },
+        {
+          "name": "month",
+          "type": "const"
+        },
+        {
+          "name": "day",
+          "type": "const"
+        },
+        {
+          "name": "CONSTANTS",
+          "type": "const"
+        }
+      ],
+      "dependencies": [],
+      "hasDefaultExport": true
+    }
+  ]
+}

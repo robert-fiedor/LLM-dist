@@ -18,6 +18,8 @@ export const parseCliArguments = trace(function parseCliArguments() {
     sourcePath: null,
     outputPath: null,
     compress: false,
+    llmOptimized: true, // LLM optimization is on by default
+    fullFormat: false,  // Full format is off by default
   };
   
   // Parse arguments
@@ -33,6 +35,11 @@ export const parseCliArguments = trace(function parseCliArguments() {
       config.outputPath = args[i];
     } else if (arg === '--compress' || arg === '-c') {
       config.compress = true;
+    } else if (arg === '--full-format' || arg === '-f') {
+      config.fullFormat = true;
+      config.llmOptimized = false; // Turn off LLM optimization when full format is requested
+    } else if (arg === '--help' || arg === '-h') {
+      config.help = true;
     } else if (arg.startsWith('-')) {
       throw new UserInputError(`Unknown option: ${arg}`);
     } else if (!config.sourcePath) {
@@ -41,13 +48,15 @@ export const parseCliArguments = trace(function parseCliArguments() {
     }
   }
   
-  // Source path is required
-  if (!config.sourcePath) {
+  // Source path is required unless help is requested
+  if (!config.sourcePath && !config.help) {
     throw new UserInputError('Source path is required. Usage: node extract-manifest.js <source-folder> [--out <file>] [--compress]');
   }
   
-  // Resolve source path
-  config.sourcePath = path.resolve(config.sourcePath);
+  // Resolve source path if provided
+  if (config.sourcePath) {
+    config.sourcePath = path.resolve(config.sourcePath);
+  }
   
   // Set default output path if not provided
   if (!config.outputPath) {
@@ -65,12 +74,17 @@ export const printUsage = trace(function printUsage() {
 JavaScript Project Manifest Extractor
 
 Usage:
-  node extract-manifest.js <source-folder> [--out <file>] [--compress]
+  node extract-manifest.js <source-folder> [options]
 
 Options:
-  --out, -o <file>   Specify output file path (default: project.manifest.json)
-  --compress, -c     Compress output with gzip
-  --help, -h         Show this help message
+  --out, -o <file>    Specify output file path (default: project.manifest.json)
+  --compress, -c      Compress output with gzip
+  --full-format, -f   Include all metadata (locations, stats, etc.) - more verbose
+  --help, -h          Show this help message
+
+Notes:
+  - By default, output is optimized for LLM consumption (removes locations, stats, etc.)
+  - Use --full-format to get the complete manifest with all details
 
 Example:
   node extract-manifest.js ./src --out my-project.manifest.json --compress
